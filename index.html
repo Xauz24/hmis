@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HMISReport CMOE</title>
+    <title>HMIS Data - CMOEast</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #1d3557;
+            --secondary: #457b9d;
+            --accent: #e63946;
             --bg-color: #f8f9fa;
             --border-color: #dee2e6;
         }
@@ -25,7 +27,7 @@
             overflow: hidden; 
         }
 
-        /* Header Styles */
+        /* Top Header */
         .header {
             background-color: var(--primary);
             color: white;
@@ -33,7 +35,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            height: 8vh; 
+            height: 7vh; 
             box-sizing: border-box;
             z-index: 10;
         }
@@ -41,21 +43,55 @@
         .title-section h1 { margin: 0; font-size: clamp(1rem, 2vh, 1.5rem); }
         .title-section p { margin: 0; font-size: clamp(0.7rem, 1.2vh, 0.9rem); color: #a8dadc; }
 
+        /* Navigation Tabs Menu */
+        .nav-tabs {
+            background-color: white;
+            display: flex;
+            padding: 0 2vw;
+            border-bottom: 2px solid var(--border-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            z-index: 9;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #6c757d;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: 0.3s;
+        }
+
+        .nav-btn:hover { color: var(--secondary); background: #f8f9fa; }
+        .nav-btn.active { color: var(--primary); border-bottom: 3px solid var(--primary); background: #f1f5f9; }
+
+        /* Controls Section */
+        .controls-bar {
+            padding: 1vh 2vw;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #eef2f5;
+            border-bottom: 1px solid var(--border-color);
+        }
+
         .controls { display: flex; align-items: center; gap: 10px; }
         
-        .setting-box { background: rgba(255,255,255,0.1); padding: 0.5vh 1vw; border-radius: 4px; font-size: clamp(0.8rem, 1.5vh, 1rem); }
-        select { padding: 3px; border-radius: 4px; border: none; outline: none; font-family: 'Inter', sans-serif; background: white; color: #333;}
+        select { padding: 5px; border-radius: 4px; border: 1px solid #ccc; outline: none; font-family: 'Inter'; background: white;}
 
         .btn {
-            background-color: white; color: var(--primary); border: none;
+            background-color: white; color: var(--primary); border: 1px solid var(--border-color);
             padding: 0.8vh 1vw; border-radius: 4px; font-weight: 600;
-            cursor: pointer; font-size: clamp(0.8rem, 1.5vh, 1rem);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            cursor: pointer; font-size: 0.9rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         .btn:hover:not(:disabled) { background-color: #e9ecef; }
-        .btn:disabled { background-color: #ced4da; color: #6c757d; cursor: not-allowed; box-shadow: none;}
+        .btn:disabled { background-color: #ced4da; color: #6c757d; cursor: not-allowed; }
 
-        .column-indicator { font-weight: 600; background: rgba(255,255,255,0.1); padding: 0.8vh 1vw; border-radius: 4px; font-size: clamp(0.8rem, 1.5vh, 1rem); border: 1px solid rgba(255,255,255,0.2); }
+        .column-indicator { font-weight: 600; background: white; padding: 0.8vh 1vw; border-radius: 4px; font-size: 0.9rem; border: 1px solid var(--border-color); }
 
         /* Table Container */
         .table-container {
@@ -66,91 +102,59 @@
             position: relative;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            white-space: nowrap;
-        }
+        table { width: 100%; border-collapse: collapse; white-space: nowrap; }
 
-        th, td {
-            text-align: center;
-            border: 1px solid var(--border-color);
-            font-size: 13px; 
-            padding: 8px 10px; 
-        }
+        th, td { text-align: center; border: 1px solid var(--border-color); font-size: 13px; padding: 8px 10px; }
 
-        /* Table Headers */
-        th {
-            position: sticky; 
-            top: 0; 
-            z-index: 4; 
-            font-weight: 600;
-            max-width: 250px; 
-            overflow: hidden; 
-            text-overflow: ellipsis; 
-            white-space: normal;
-            box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4); 
-        }
+        /* Sticky Headers & First Column */
+        th { position: sticky; top: 0; z-index: 4; font-weight: 600; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: normal; box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4); }
+        td:first-child { position: sticky; left: 0; z-index: 3; text-align: left; font-weight: 700; border-right: 3px solid var(--primary); min-width: 150px; }
+        th:first-child { position: sticky; left: 0; top: 0; z-index: 5; border-right: 3px solid #ffffff; }
 
-        /* Freeze First Column */
-        td:first-child {
-            position: sticky; 
-            left: 0; 
-            z-index: 3; 
-            text-align: left; 
-            font-weight: 700;
-            border-right: 3px solid var(--primary); 
-            min-width: 150px;
-        }
-
-        th:first-child {
-            position: sticky;
-            left: 0;
-            top: 0;
-            z-index: 5; 
-            border-right: 3px solid #ffffff;
-        }
-
-        /* Row Hover Effect */
         tr:hover td { filter: brightness(0.92) contrast(1.1); transition: 0.1s; }
 
-        /* Status Bar */
-        .status-bar {
-            background: var(--primary); color: white; text-align: center;
-            padding: 0.5vh; font-size: clamp(0.7rem, 1.2vh, 0.9rem); font-weight: 600; height: 3vh; box-sizing: border-box;
-            z-index: 10;
-        }
-
-        /* Loader */
+        /* Status & Loader */
+        .status-bar { background: var(--primary); color: white; text-align: center; padding: 0.5vh; font-size: 0.85rem; font-weight: 600; height: 3vh; box-sizing: border-box; z-index: 10; }
+        
         #loader {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.95); display: flex; justify-content: center; align-items: center;
-            z-index: 100; font-size: 1.5rem; color: var(--primary); font-weight: bold;
+            background: rgba(255,255,255,0.9); display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 100; font-size: 1.2rem; color: var(--primary); font-weight: bold;
         }
 
-        /* Custom Scrollbars */
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 10px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
         ::-webkit-scrollbar { width: 10px; height: 12px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 6px; border: 2px solid #f1f1f1; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <div class="title-section">
-            <h1>HMIS Data</h1>
+            <h1 id="mainTitle">HMIS Data </h1>
             <p>CMO Aizawl East District</p>
         </div>
+    </div>
+
+    <div class="nav-tabs">
+        <button class="nav-btn active" id="tab-ANC" onclick="loadTab('ANC')">Ante Natal Care (ANC)</button>
+        <button class="nav-btn" id="tab-Immunization" onclick="loadTab('Immunization')">Child Immunization</button>
+        </div>
+
+    <div class="controls-bar">
+        <div class="setting-box">
+            <label style="font-weight: 600; margin-right: 5px; color: var(--primary);">View Mode:</label>
+            <select id="colSelect" onchange="changeColLimit()">
+                <option value="10">10 Columns</option>
+                <option value="15" selected>15 Columns</option>
+                <option value="20">20 Columns</option>
+                <option value="999">All Columns</option>
+            </select>
+        </div>
         <div class="controls">
-            <div class="setting-box">
-                <select id="colSelect" onchange="changeColLimit()">
-                    <option value="10">10 Cols</option>
-                    <option value="15" selected>15 Cols</option>
-                    <option value="20">20 Cols</option>
-                    <option value="999">All Cols</option>
-                </select>
-            </div>
             <button class="btn" id="prevBtn" onclick="changeColumns(-1)" disabled>&#8592; Prev</button>
             <div class="column-indicator" id="colIndicator">Cols: 0/0</div>
             <button class="btn" id="nextBtn" onclick="changeColumns(1)" disabled>Next &#8594;</button>
@@ -158,17 +162,19 @@
     </div>
 
     <div class="table-container">
-        <div id="loader">Fetching Data & Colors from Google Sheets...</div>
+        <div id="loader">
+            <div class="spinner"></div>
+            <span id="loaderText">Loading Data...</span>
+        </div>
         <table id="dataTable">
             <thead id="tableHead"></thead>
             <tbody id="tableBody"></tbody>
         </table>
     </div>
 
-    <div class="status-bar" id="statusBar">Connecting to Database...</div>
+    <div class="status-bar" id="statusBar">System Ready</div>
 
     <script>
-        // LIVE URL
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzX54Nbo87lqCVreZ3aT556CkUEOnzWUq-_idBk-y6Ey8DeOE1ITzr5YJ5yKCZOS8J60w/exec';
         
         let allValues = [];
@@ -180,15 +186,42 @@
         
         let currentStartCol = 1; 
         let colsPerPage = 15;
+        let currentTab = 'ANC'; 
         
-        function loadData() {
+        function loadTab(sheetName) {
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            if(document.getElementById('tab-' + sheetName)) {
+                document.getElementById('tab-' + sheetName).classList.add('active');
+            }
+            
+            document.getElementById('loader').style.display = 'flex';
+            document.getElementById('loaderText').innerText = `Fetching ${sheetName} data...`;
+            document.getElementById('statusBar').innerText = `Connecting to Google Sheets: ${sheetName}...`;
+            document.getElementById('statusBar').style.backgroundColor = "var(--primary)";
+
+            currentStartCol = 1;
+            currentTab = sheetName;
+            
+            const callbackName = 'processJSONP_' + Math.floor(Math.random() * 100000);
+            window[callbackName] = function(data) {
+                processData(data);
+                delete window[callbackName]; 
+            };
+
             var script = document.createElement('script');
-            script.src = SCRIPT_URL + '?callback=processJSONP';
+            script.src = `${SCRIPT_URL}?sheetName=${encodeURIComponent(sheetName)}&callback=${callbackName}`;
             document.body.appendChild(script);
         }
 
-        function processJSONP(data) {
-            document.getElementById('statusBar').innerText = "✅ Office of the Chief Medical Officer, Aizawl East District";
+        function processData(data) {
+            if (data.error) {
+                document.getElementById('statusBar').innerText = "❌ Error: " + data.error;
+                document.getElementById('statusBar').style.backgroundColor = "#e74c3c";
+                document.getElementById('loader').innerHTML = `<h2 style="color:#e74c3c">Sheet not found. Check name in Google Sheets.</h2>`;
+                return;
+            }
+
+            document.getElementById('statusBar').innerText = `✅ Office of the Chief Medical Officer, Aizawl East District`;
             document.getElementById('statusBar').style.backgroundColor = "#2ecc71";
             document.getElementById('loader').style.display = "none";
             
@@ -196,12 +229,17 @@
             allBgColors = data.backgrounds;
             allTextColors = data.fontColors;
             
-            if (allValues.length > 2) {
-                headersIndex = 2;
-                dataStartIndex = 3;
-            } else {
-                headersIndex = 0;
-                dataStartIndex = 1;
+            // SMART DETECTION: Find exactly where headers and data start
+            dataStartIndex = 1;
+            headersIndex = 0;
+            for (let i = 0; i < allValues.length; i++) {
+                let cell0 = allValues[i][0] ? allValues[i][0].toString().trim().toLowerCase() : "";
+                // Assume data starts when a real facility name appears (not empty, not "facility name")
+                if (cell0 !== "" && cell0 !== "facility name" && cell0 !== "sl. no" && cell0 !== "sl.no" && i > 0) {
+                    dataStartIndex = i;
+                    headersIndex = i - 1; // Header is the row just above the first data row
+                    break;
+                }
             }
             
             renderTable();
@@ -214,76 +252,103 @@
         }
 
         function renderTable() {
-            if (allValues.length === 0) return;
+            if (!allValues || allValues.length === 0) return;
 
             const thead = document.getElementById('tableHead');
             const tbody = document.getElementById('tableBody');
             
-            let totalCols = allValues[headersIndex].length;
-            let totalDataCols = totalCols - 1;
+            let totalCols = allValues[headersIndex] ? allValues[headersIndex].length : 0;
+            let totalDataCols = totalCols > 0 ? totalCols - 1 : 0;
             let endCol = currentStartCol + colsPerPage - 1;
             if (endCol >= totalCols) endCol = totalCols - 1;
 
-            // 1. RENDER HEADERS
+            // ==========================================
+            // 1. SMART HEADER RESOLUTION
+            // ==========================================
             let headHTML = `<tr>`;
-            let hBg0 = allBgColors[headersIndex][0];
-            let hFg0 = allTextColors[headersIndex][0];
-            let hText0 = allValues[headersIndex][0] || "Facility Name";
+            
+            // Facility Name Column Header
+            let hBg0 = allBgColors[headersIndex] ? allBgColors[headersIndex][0] : '#ffffff';
+            let hFg0 = allTextColors[headersIndex] ? allTextColors[headersIndex][0] : '#000000';
+            let hText0 = "Facility Name";
+            // Scan up to find actual text if empty
+            for(let r = headersIndex; r >= 0; r--) {
+                if(allValues[r] && allValues[r][0] && allValues[r][0].toString().trim() !== "") {
+                    hText0 = allValues[r][0]; break;
+                }
+            }
             headHTML += `<th style="background-color: ${hBg0 === '#ffffff' ? 'var(--primary)' : hBg0}; color: ${hFg0 === '#000000' && hBg0 === '#ffffff' ? 'white' : hFg0};">${hText0}</th>`;
 
+            // Data Columns Headers
             for (let c = currentStartCol; c <= endCol; c++) {
-                let hBg = allBgColors[headersIndex][c];
-                let hFg = allTextColors[headersIndex][c];
-                let hText = allValues[headersIndex][c] || `Col ${c}`;
+                let hBg = allBgColors[headersIndex] ? allBgColors[headersIndex][c] : '#ffffff';
+                let hFg = allTextColors[headersIndex] ? allTextColors[headersIndex][c] : '#000000';
                 
+                let hText = "";
+                // 1. Scan UPWARDS to find text (Handles multi-row headers)
+                for (let r = headersIndex; r >= 0; r--) {
+                    if (allValues[r] && allValues[r][c] && allValues[r][c].toString().trim() !== "") {
+                        hText = allValues[r][c];
+                        break;
+                    }
+                }
+                
+                // 2. Scan LEFTWARDS if still empty (Handles Percentage/Merged columns)
+                if (!hText) {
+                    for (let left = c - 1; left >= 1; left--) {
+                        let leftVal = allValues[headersIndex] ? allValues[headersIndex][left].toString().trim() : "";
+                        if (leftVal !== "") {
+                            let shortName = leftVal.split('::')[0].trim(); // Extract "1.1" etc.
+                            if(shortName.length > 15) shortName = shortName.substring(0, 15) + "..";
+                            hText = "% (" + shortName + ")";
+                            break;
+                        }
+                    }
+                }
+                
+                // 3. Final Fallback
+                if (!hText) hText = `Col ${c}`;
+
                 let styleBg = hBg === '#ffffff' ? 'background-color: var(--primary);' : `background-color: ${hBg};`;
                 let styleFg = `color: ${hFg === '#000000' && hBg === '#ffffff' ? 'white' : hFg};`;
-                
                 headHTML += `<th style="${styleBg} ${styleFg}">${hText}</th>`;
             }
             headHTML += `</tr>`;
             thead.innerHTML = headHTML;
 
-            // 2. RENDER DATA ROWS (WITH ZEBRA STRIPING)
+            // ==========================================
+            // 2. DATA ROWS WITH ZEBRA STRIPING
+            // ==========================================
             let bodyHTML = "";
-            let visibleRowIndex = 0; // Hei hian row zat dik tak a chhiar ang
+            let visibleRowIndex = 0; 
 
             for (let r = dataStartIndex; r < allValues.length; r++) {
                 let rowValues = allValues[r];
                 let rowBgs = allBgColors[r];
                 let rowFgs = allTextColors[r];
 
-                // Skip empty rows
-                if (!rowValues[0] || rowValues[0] === "") continue; 
+                if (!rowValues || !rowValues[0] || rowValues[0] === "") continue; 
 
-                // Zebra Striping Logic
                 let isEvenRow = (visibleRowIndex % 2 === 1);
-                let zebraBgColor = isEvenRow ? '#f2f6fa' : '#ffffff'; // Light blue-grey for alternate rows
-                let zebraFirstColColor = isEvenRow ? '#e6edf5' : '#fdfdfd'; // Slightly darker for frozen column
+                let zebraBgColor = isEvenRow ? '#f2f6fa' : '#ffffff'; 
+                let zebraFirstColColor = isEvenRow ? '#e6edf5' : '#fdfdfd'; 
 
                 bodyHTML += `<tr>`;
                 
-                // Frozen First Column
                 let cellBg0 = rowBgs[0] === '#ffffff' ? `background-color: ${zebraFirstColColor};` : `background-color: ${rowBgs[0]};`;
                 let cellFg0 = `color: ${rowFgs[0] === '#000000' && rowBgs[0] === '#ffffff' ? 'var(--primary)' : rowFgs[0]};`;
                 bodyHTML += `<td style="${cellBg0} ${cellFg0}">${rowValues[0]}</td>`; 
                 
-                // Data Columns
                 for (let c = currentStartCol; c <= endCol; c++) {
                     let val = rowValues[c] !== undefined && rowValues[c] !== "" ? rowValues[c] : "-";
-                    
-                    // Apply Zebra color only if Google Sheet color is default white
                     let cBg = rowBgs[c] === '#ffffff' ? `background-color: ${zebraBgColor};` : `background-color: ${rowBgs[c]};`;
                     let cFg = `color: ${rowFgs[c]};`;
-                    
                     bodyHTML += `<td style="${cBg} ${cFg}">${val}</td>`;
                 }
                 bodyHTML += `</tr>`;
-                
                 visibleRowIndex++;
             }
             tbody.innerHTML = bodyHTML;
-
             updateControls(endCol, totalDataCols);
         }
 
@@ -300,12 +365,14 @@
         function changeColumns(direction) {
             if (direction === 1) currentStartCol += colsPerPage;
             else currentStartCol -= colsPerPage;
-
             if (currentStartCol < 1) currentStartCol = 1;
             renderTable();
         }
 
-        loadData();
+        // Initialize default tab on page load
+        window.onload = function() {
+            loadTab(currentTab);
+        };
     </script>
 </body>
 </html>
